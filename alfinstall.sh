@@ -73,7 +73,7 @@ echogreen () {
 }
 cd /tmp
 if [ -d "alfrescoinstall" ]; then
-	rm -rf alfrescoinstall
+  rm -rf alfrescoinstall
 fi
 mkdir alfrescoinstall
 cd ./alfrescoinstall
@@ -128,35 +128,38 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sudo apt-get $APTVERBOSITY install curl;
 fi
 
-echo
-echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-echo "You need to add a system user that runs the tomcat Alfresco instance."
-echo "Also updates locale support."
-echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Add alfresco system user${ques} [y/n] " -i "n" addalfresco
-if [ "$addalfresco" = "y" ]; then
-  sudo adduser --system --disabled-login --disabled-password --group $ALF_USER
-  echo
-  echo "Adding locale support"
-  #install locale to support that locale date formats in open office transformations
-  sudo locale-gen $LOCALESUPPORT
-  echo
-  echogreen "Finished adding alfresco user"
-  echo
-else
-  echo "Skipping adding alfresco user"
-  echo
-fi
+####################################################################################################
+##### This user is a part of the Chef setup so every CMS server would have this user.
+####################################################################################################
+#echo
+#echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+#echo "You need to add a system user that runs the tomcat Alfresco instance."
+#echo "Also updates locale support."
+#echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+#read -e -p "Add alfresco system user${ques} [y/n] " -i "n" addalfresco
+#if [ "$addalfresco" = "y" ]; then
+#  sudo adduser --system --disabled-login --disabled-password --group $ALF_USER
+#  echo
+#  echo "Adding locale support"
+#  #install locale to support that locale date formats in open office transformations
+#  sudo locale-gen $LOCALESUPPORT
+#  echo
+#  echogreen "Finished adding alfresco user"
+#  echo
+#else
+#  echo "Skipping adding alfresco user"
+#  echo
+#fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo "Ubuntu default for number of allowed open files in the file system is too low"
 echo "for alfresco use and tomcat may because of this stop with the error"
-echo "\"too many open files\". You should update this value if you have not done so."
+echo "\"too many open files\"."
 echo "Read more at http://wiki.alfresco.com/wiki/Too_many_open_files"
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Add limits.conf${ques} [y/n] " -i "n" updatelimits
-if [ "$updatelimits" = "y" ]; then
+#read -e -p "Add limits.conf${ques} [y/n] " -i "n" updatelimits
+#if [ "$updatelimits" = "y" ]; then
   echo "alfresco  soft  nofile  8192" | sudo tee -a /etc/security/limits.conf
   echo "alfresco  hard  nofile  65536" | sudo tee -a /etc/security/limits.conf
   echo
@@ -167,10 +170,10 @@ if [ "$updatelimits" = "y" ]; then
   echo
   echogreen "Updated /etc/security/common-session*"
   echo
-else
-  echo "Skipped updating limits.conf"
-  echo
-fi
+#else
+#  echo "Skipped updating limits.conf"
+#  echo
+#fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -178,9 +181,9 @@ echo "Tomcat is the application server that runs Alfresco."
 echo "You will also get the option to install jdbc lib for Postgresql or MySql/MariaDB."
 echo "Install the jdbc lib for the database you intend to use."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install Tomcat${ques} [y/n] " -i "n" installtomcat
+#read -e -p "Install Tomcat${ques} [y/n] " -i "n" installtomcat
 
-if [ "$installtomcat" = "y" ]; then
+#if [ "$installtomcat" = "y" ]; then
   echogreen "Installing Tomcat"
   echo "Downloading tomcat..."
   curl -# -L -O $TOMCAT_DOWNLOAD
@@ -227,38 +230,38 @@ if [ "$installtomcat" = "y" ]; then
   sed -i "s/@@ALFRESCO_REPO_SERVER@@/$REPO_HOSTNAME/g" $ALFRESCO_GLOBAL_PROPERTIES
   sudo mv $ALFRESCO_GLOBAL_PROPERTIES $CATALINA_HOME/shared/classes/
 
-  read -e -p "Install Share config file (recommended)${ques} [y/n] " -i "n" installshareconfig
-  if [ "$installshareconfig" = "y" ]; then
+#  read -e -p "Install Share config file (recommended)${ques} [y/n] " -i "n" installshareconfig
+#  if [ "$installshareconfig" = "y" ]; then
     SHARE_CONFIG_CUSTOM=/tmp/alfrescoinstall/share-config-custom.xml
     sudo curl -# -o $SHARE_CONFIG_CUSTOM $BASE_DOWNLOAD/tomcat/share-config-custom.xml
     sed -i "s/@@ALFRESCO_SHARE_SERVER@@/$SHARE_HOSTNAME/g" $SHARE_CONFIG_CUSTOM
     sed -i "s/@@ALFRESCO_REPO_SERVER@@/$REPO_HOSTNAME/g" $SHARE_CONFIG_CUSTOM
     sudo mv $SHARE_CONFIG_CUSTOM $CATALINA_HOME/shared/classes/alfresco/web-extension/
-  fi
+#  fi
 
   echo
-  read -e -p "Install Postgres JDBC Connector${ques} [y/n] " -i "n" installpg
-  if [ "$installpg" = "y" ]; then
-	curl -# -O $JDBCPOSTGRESURL/$JDBCPOSTGRES
-	sudo mv $JDBCPOSTGRES $CATALINA_HOME/lib
-  fi
+#  read -e -p "Install Postgres JDBC Connector${ques} [y/n] " -i "n" installpg
+#  if [ "$installpg" = "y" ]; then
+  curl -# -O $JDBCPOSTGRESURL/$JDBCPOSTGRES
+  sudo mv $JDBCPOSTGRES $CATALINA_HOME/lib
+#  fi
   echo
-  read -e -p "Install Mysql JDBC Connector${ques} [y/n] " -i "n" installmy
-  if [ "$installmy" = "y" ]; then
+#  read -e -p "Install Mysql JDBC Connector${ques} [y/n] " -i "n" installmy
+#  if [ "$installmy" = "y" ]; then
     cd /tmp/alfrescoinstall
-	curl -# -L -O $JDBCMYSQLURL/$JDBCMYSQL
-	tar xf $JDBCMYSQL
-	cd "$(find . -type d -name "mysql-connector*")"
-	sudo mv mysql-connector*.jar $CATALINA_HOME/lib
-  fi
+  curl -# -L -O $JDBCMYSQLURL/$JDBCMYSQL
+  tar xf $JDBCMYSQL
+  cd "$(find . -type d -name "mysql-connector*")"
+  sudo mv mysql-connector*.jar $CATALINA_HOME/lib
+#  fi
   sudo chown -R $ALF_USER:$ALF_GROUP $ALF_HOME
   echo
   echogreen "Finished installing Tomcat"
   echo
-else
-  echo "Skipping install of Tomcat"
-  echo
-fi
+#else
+#  echo "Skipping install of Tomcat"
+#  echo
+#fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -270,8 +273,8 @@ echo "You can run Alfresco fine without installing nginx."
 echo "If you prefer to use Apache, install that manually. Or you can use iptables"
 echo "forwarding, sample script in $ALF_HOME/scripts/iptables.sh"
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install nginx${ques} [y/n] " -i "n" installnginx
-if [ "$installnginx" = "y" ]; then
+#read -e -p "Install nginx${ques} [y/n] " -i "n" installnginx
+#if [ "$installnginx" = "y" ]; then
   echoblue "Installing nginx. Fetching packages..."
   echo
 sudo -s << EOF
@@ -301,9 +304,9 @@ EOF
   echo
   echogreen "Finished installing nginx"
   echo
-else
-  echo "Skipping install of nginx"
-fi
+#else
+#  echo "Skipping install of nginx"
+#fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -311,8 +314,8 @@ echo "Install Java JDK."
 echo "This will install Oracle Java 8 version of Java. If you prefer OpenJDK"
 echo "you need to download and install that manually."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install Oracle Java 8${ques} [y/n] " -i "n" installjdk
-if [ "$installjdk" = "y" ]; then
+#read -e -p "Install Oracle Java 8${ques} [y/n] " -i "n" installjdk
+#if [ "$installjdk" = "y" ]; then
   echoblue "Installing Oracle Java 8. Fetching packages..."
   sudo apt-get $APTVERBOSITY install python-software-properties software-properties-common
   sudo add-apt-repository ppa:webupd8team/java
@@ -323,11 +326,11 @@ if [ "$installjdk" = "y" ]; then
   echo
   echogreen "Finished installing Oracle Java 8"
   echo
-else
-  echo "Skipping install of Oracle Java 8"
-  echored "IMPORTANT: You need to install other JDK and adjust paths for the install to be complete"
-  echo
-fi
+#else
+#  echo "Skipping install of Oracle Java 8"
+#  echored "IMPORTANT: You need to install other JDK and adjust paths for the install to be complete"
+#  echo
+#fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -337,8 +340,8 @@ echo "Newer version of Libreoffice has better document filters, and produce bett
 echo "transformations. If you prefer to use Ubuntu standard packages you can skip"
 echo "this install."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install LibreOffice${ques} [y/n] " -i "n" installibreoffice
-if [ "$installibreoffice" = "y" ]; then
+#read -e -p "Install LibreOffice${ques} [y/n] " -i "n" installibreoffice
+#if [ "$installibreoffice" = "y" ]; then
 
   cd /tmp/alfrescoinstall
   curl -# -L -O $LIBREOFFICE
@@ -353,13 +356,13 @@ if [ "$installibreoffice" = "y" ]; then
   echo
   echogreen "Finished installing LibreOffice"
   echo
-else
-  echo
-  echo "Skipping install of LibreOffice"
-  echored "If you install LibreOffice/OpenOffice separetely, remember to update alfresco-global.properties"
-  echored "Also run: sudo apt-get install ttf-mscorefonts-installer fonts-droid libxinerama1"
-  echo
-fi
+#else
+#  echo
+#  echo "Skipping install of LibreOffice"
+#  echored "If you install LibreOffice/OpenOffice separetely, remember to update alfresco-global.properties"
+#  echored "Also run: sudo apt-get install ttf-mscorefonts-installer fonts-droid libxinerama1"
+#  echo
+#fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -368,8 +371,8 @@ echo "This will ImageMagick from Ubuntu packages."
 echo "It is recommended that you install ImageMagick."
 echo "If you prefer some other way of installing ImageMagick, skip this step."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install ImageMagick${ques} [y/n] " -i "n" installimagemagick
-if [ "$installimagemagick" = "y" ]; then
+#read -e -p "Install ImageMagick${ques} [y/n] " -i "n" installimagemagick
+#if [ "$installimagemagick" = "y" ]; then
 
   echoblue "Installing ImageMagick. Fetching packages..."
   sudo apt-get $APTVERBOSITY install imagemagick ghostscript libgs-dev libjpeg62 libpng3
@@ -380,12 +383,12 @@ if [ "$installimagemagick" = "y" ]; then
   echo
   echogreen "Finished installing ImageMagick"
   echo
-else
-  echo
-  echo "Skipping install of ImageMagick"
-  echored "Remember to install ImageMagick later. It is needed for thumbnail transformations."
-  echo
-fi
+#else
+#  echo
+#  echo "Skipping install of ImageMagick"
+#  echored "Remember to install ImageMagick later. It is needed for thumbnail transformations."
+#  echo
+#fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -394,9 +397,9 @@ echo "This will download and install swftools used for transformations to Flash.
 echo "Since the swftools Ubuntu package is not included in all versions of Ubuntu,"
 echo "this install downloads from swftools.org and compiles."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install Swftools${ques} [y/n] " -i "n" installswftools
+#read -e -p "Install Swftools${ques} [y/n] " -i "n" installswftools
 
-if [ "$installswftools" = "y" ]; then
+#if [ "$installswftools" = "y" ]; then
   echoblue "Installing build tools and libraries needed to compile swftools. Fetching packages..."
   sudo apt-get $APTVERBOSITY install make build-essential ccache g++ libgif-dev libjpeg62-dev libfreetype6-dev libpng12-dev libt1-dev
   cd /tmp/alfrescoinstall
@@ -409,12 +412,12 @@ if [ "$installswftools" = "y" ]; then
   echo
   echogreen "Finished installing Swftools"
   echo
-else
-  echo
-  echo "Skipping install of Swftools."
-  echored "Remember to install swftools via Ubuntu packages or by any other mean."
-  echo
-fi
+#else
+#  echo
+#  echo "Skipping install of Swftools."
+#   echored "Remember to install swftools via Ubuntu packages or by any other mean."
+#   echo
+# fi
 
 echo
 echoblue "Adding basic support files. Always installed if not present."
@@ -497,29 +500,29 @@ echo "If you have downloaded your war files you can skip this step add them manu
 echo "This install place downloaded files in the $ALF_HOME/addons and then use the"
 echo "apply.sh script to add them to tomcat/webapps. Se this script for more info."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Add Alfresco war files${ques} [y/n] " -i "n" installwar
-if [ "$installwar" = "y" ]; then
+# read -e -p "Add Alfresco war files${ques} [y/n] " -i "n" installwar
+# if [ "$installwar" = "y" ]; then
 
   echogreen "Downloading alfresco and share war files..."
   sudo curl -# -o $ALF_HOME/addons/war/alfresco.war $ALFREPOWAR
   sudo curl -# -o $ALF_HOME/addons/war/share.war $ALFSHAREWAR
 
   cd /tmp/alfrescoinstall
-  read -e -p "Add Google docs integration${ques} [y/n] " -i "n" installgoogledocs
-  if [ "$installgoogledocs" = "y" ]; then
-  	echo "Downloading Google docs addon..."
+  # read -e -p "Add Google docs integration${ques} [y/n] " -i "n" installgoogledocs
+  # if [ "$installgoogledocs" = "y" ]; then
+    echo "Downloading Google docs addon..."
     curl -# -O $GOOGLEDOCSREPO
     sudo mv alfresco-googledocs-repo*.amp $ALF_HOME/addons/alfresco/
     curl -# -O $GOOGLEDOCSSHARE
     sudo mv alfresco-googledocs-share* $ALF_HOME/addons/share/
-  fi
+  # fi
 
-  read -e -p "Add Sharepoint plugin${ques} [y/n] " -i "n" installspp
-  if [ "$installspp" = "y" ]; then
+  # read -e -p "Add Sharepoint plugin${ques} [y/n] " -i "n" installspp
+  # if [ "$installspp" = "y" ]; then
     echo "Downloading Sharepoint addon..."
     curl -# -O $SPP
     sudo mv alfresco-spp*.amp $ALF_HOME/addons/alfresco/
-  fi
+  # fi
 
   # Check if Java is installed before trying to apply
   if type -p java; then
@@ -538,11 +541,11 @@ if [ "$installwar" = "y" ]; then
   echo
   echogreen "Finished adding Alfresco war files"
   echo
-else
-  echo
-  echo "Skipping adding Alfresco war files"
-  echo
-fi
+# else
+#   echo
+#   echo "Skipping adding Alfresco war files"
+#   echo
+# fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -550,8 +553,8 @@ echo "Install Solr4 indexing engine."
 echo "You can run Solr4 on a separate server, unless you plan to do that you should"
 echo "install the Solr4 indexing engine on the same server as your repository server."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -e -p "Install Solr4 indexing engine${ques} [y/n] " -i "n" installsolr
-if [ "$installsolr" = "y" ]; then
+# read -e -p "Install Solr4 indexing engine${ques} [y/n] " -i "n" installsolr
+# if [ "$installsolr" = "y" ]; then
 
   # Make sure we have unzip available
   sudo apt-get $APTVERBOSITY install unzip
@@ -614,12 +617,12 @@ if [ "$installsolr" = "y" ]; then
   echored "Verify your setting in alfresco-global.properties."
   echo "Set property value index.subsystem.name=solr4"
   echo
-else
-  echo
-  echo "Skipping installing Solr4."
-  echo "You can always install Solr4 at a later time."
-  echo
-fi
+# else
+#   echo
+#   echo "Skipping installing Solr4."
+#   echo "You can always install Solr4 at a later time."
+#   echo
+# fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"

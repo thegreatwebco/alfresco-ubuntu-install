@@ -128,28 +128,25 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sudo apt-get $APTVERBOSITY install curl;
 fi
 
-####################################################################################################
-##### This user is a part of the Chef setup so every CMS server would have this user.
-####################################################################################################
-#echo
-#echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-#echo "You need to add a system user that runs the tomcat Alfresco instance."
-#echo "Also updates locale support."
-#echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-#read -e -p "Add alfresco system user${ques} [y/n] " -i "n" addalfresco
-#if [ "$addalfresco" = "y" ]; then
-#  sudo adduser --system --disabled-login --disabled-password --group $ALF_USER
-#  echo
-#  echo "Adding locale support"
-#  #install locale to support that locale date formats in open office transformations
-#  sudo locale-gen $LOCALESUPPORT
-#  echo
-#  echogreen "Finished adding alfresco user"
-#  echo
-#else
-#  echo "Skipping adding alfresco user"
-#  echo
-#fi
+echo
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+echo "Adding a system user that runs the tomcat Alfresco instance."
+echo "Also updates locale support."
+echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+# read -e -p "Add alfresco system user${ques} [y/n] " -i "n" addalfresco
+# if [ "$addalfresco" = "y" ]; then
+  sudo adduser --system --disabled-login --disabled-password --group $ALF_USER
+  echo
+  echo "Adding locale support"
+  #install locale to support that locale date formats in open office transformations
+  sudo locale-gen $LOCALESUPPORT
+  echo
+  echogreen "Finished adding alfresco user"
+  echo
+# else
+#   echo "Skipping adding alfresco user"
+#   echo
+# fi
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"

@@ -135,7 +135,8 @@ echo "Also updates locale support."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 # read -e -p "Add alfresco system user${ques} [y/n] " -i "n" addalfresco
 # if [ "$addalfresco" = "y" ]; then
-  sudo adduser --system --disabled-login --disabled-password --group $ALF_USER
+  # sudo adduser --system --disabled-login --disabled-password --group $ALF_USER
+  sudo adduser $ALF_USER
   echo
   echo "Adding locale support"
   #install locale to support that locale date formats in open office transformations

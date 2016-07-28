@@ -15,7 +15,7 @@ export APTVERBOSITY="-qq -y"
 export TMP_INSTALL=/tmp/alfrescoinstall
 
 # Branch name to pull from server. Use master for stable.
-BRANCH=14.04
+BRANCH=16.04
 export BASE_DOWNLOAD=https://raw.githubusercontent.com/thegreatwebco/alfresco-ubuntu-install/$BRANCH
 export KEYSTOREBASE=https://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/keystore
 
@@ -350,7 +350,7 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
   echo
   echoblue "Installing some support fonts for better transformations."
   # libxinerama1 libglu1-mesa needed to get LibreOffice 4.4 to work. Add the libraries that Alfresco mention in documentatinas required.
-  sudo apt-get $APTVERBOSITY install ttf-mscorefonts-installer fonts-droid libxinerama1 libglu1-mesa libsm6 libxt6 libxrender1 libfontconfig1 libcups2
+  sudo apt-get $APTVERBOSITY install ttf-mscorefonts-installer fonts-noto libxinerama1 libglu1-mesa libsm6 libxt6 libxrender1 libfontconfig1 libcups2
   echo
   echogreen "Finished installing LibreOffice"
   echo
@@ -358,7 +358,7 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 #  echo
 #  echo "Skipping install of LibreOffice"
 #  echored "If you install LibreOffice/OpenOffice separetely, remember to update alfresco-global.properties"
-#  echored "Also run: sudo apt-get install ttf-mscorefonts-installer fonts-droid libxinerama1"
+#  echored "Also run: sudo apt-get install ttf-mscorefonts-installer fonts-noto libxinerama1"
 #  echo
 #fi
 
@@ -399,7 +399,7 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 #if [ "$installswftools" = "y" ]; then
   echoblue "Installing build tools and libraries needed to compile swftools. Fetching packages..."
-  sudo apt-get $APTVERBOSITY install make build-essential ccache g++ libgif-dev libjpeg62-dev libfreetype6-dev libpng12-dev libt1-dev
+  sudo apt-get $APTVERBOSITY install make build-essential ccache g++ libgif-dev libjpeg62-dev libfreetype6-dev libpng12-dev libgif-dev
   cd /tmp/alfrescoinstall
   echo "Downloading swftools..."
   curl -# -O $SWFTOOLS

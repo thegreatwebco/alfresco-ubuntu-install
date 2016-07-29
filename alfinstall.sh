@@ -86,6 +86,17 @@ echogreen "https://github.com/loftuxab/alfresco-ubuntu-install."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo
 
+# Checking to make sure the Git branch matches the OS version.
+VERSION=$(lsb_release -sr)
+if [ "${BRANCH}" != "${VERSION}" ]; then
+    echored "Your OS is on version ${VERSION} but you are using branch ${BRANCH} of the repository."
+    read -e -p "Are you sure you want to proceed? [y/n] " -i "n" PROCEED_INSTALLATION
+    if [ "${PROCEED_INSTALLATION}" = "n" ]; then
+        echo 'Exiting installation.'
+        exit 1
+    fi
+fi
+
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 echo "Checking for the availability of the URLs inside script..."

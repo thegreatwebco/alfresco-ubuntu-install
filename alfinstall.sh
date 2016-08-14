@@ -31,8 +31,6 @@ export JDBCMYSQL=mysql-connector-java-5.1.36.tar.gz
 
 export LIBREOFFICE=http://downloadarchive.documentfoundation.org/libreoffice/old/5.0.2.2/deb/x86_64/LibreOffice_5.0.2.2_Linux_x86-64_deb.tar.gz
 
-export SWFTOOLS=http://www.swftools.org/swftools-2013-04-09-1007.tar.gz
-
 export ALFREPOWAR=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/alfresco/5.0.d/alfresco-5.0.d.war
 export ALFSHAREWAR=https://artifacts.alfresco.com/nexus/service/local/repo_groups/public/content/org/alfresco/share/5.0.d/share-5.0.d.war
 export GOOGLEDOCSREPO=https://artifacts.alfresco.com/nexus/service/local/repositories/releases/content/org/alfresco/integrations/alfresco-googledocs-repo/3.0.2/alfresco-googledocs-repo-3.0.2.amp
@@ -106,7 +104,7 @@ echo
 URLERROR=0
 
 for REMOTE in $TOMCAT_DOWNLOAD $JDBCPOSTGRESURL/$JDBCPOSTGRES $JDBCMYSQLURL/$JDBCMYSQL \
-        $LIBREOFFICE $SWFTOOLS $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR4_WAR_DOWNLOAD $SOLR4_CONFIG_DOWNLOAD $SPP
+        $LIBREOFFICE $ALFWARZIP $GOOGLEDOCSREPO $GOOGLEDOCSSHARE $SOLR4_WAR_DOWNLOAD $SOLR4_CONFIG_DOWNLOAD $SPP
 
 do
         wget --spider $REMOTE --no-check-certificate >& /dev/null
@@ -327,7 +325,7 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 #if [ "$installjdk" = "y" ]; then
   echoblue "Installing Oracle Java 8. Fetching packages..."
   sudo apt-get $APTVERBOSITY install python-software-properties software-properties-common
-  sudo add-apt-repository ppa:webupd8team/java
+  sudo add-apt-repository -y ppa:webupd8team/java
   sudo apt-get $APTVERBOSITY update
   echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
   sudo apt-get $APTVERBOSITY install oracle-java8-installer
@@ -399,34 +397,15 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 #  echo
 #fi
 
-echo
-echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-echo "Install Swftools."
-echo "This will download and install swftools used for transformations to Flash."
-echo "Since the swftools Ubuntu package is not included in all versions of Ubuntu,"
-echo "this install downloads from swftools.org and compiles."
-echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-#read -e -p "Install Swftools${ques} [y/n] " -i "n" installswftools
 
-#if [ "$installswftools" = "y" ]; then
-  echoblue "Installing build tools and libraries needed to compile swftools. Fetching packages..."
-  sudo apt-get $APTVERBOSITY install make build-essential ccache g++ libgif-dev libjpeg62-dev libfreetype6-dev libpng12-dev libgif-dev
-  cd /tmp/alfrescoinstall
-  echo "Downloading swftools..."
-  curl -# -O $SWFTOOLS
-  tar xf swftools*.tar.gz
-  cd "$(find . -type d -name "swftools*")"
-  ./configure
-  sudo make && sudo make install
-  echo
-  echogreen "Finished installing Swftools"
-  echo
-#else
-#  echo
-#  echo "Skipping install of Swftools."
-#   echored "Remember to install swftools via Ubuntu packages or by any other mean."
-#   echo
-# fi
+# Installing SWFTools via the repository because the source installation doesn't work in 16.04.
+echo
+echoblue "Installing SWFTools."
+echo
+sudo apt-get $APTVERBOSITY install swftools
+echo
+echogreen "Finished installing SWFTools."
+echo
 
 echo
 echoblue "Adding basic support files. Always installed if not present."
@@ -633,70 +612,7 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 #   echo
 # fi
 
-echo
-echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-echo "Alfresco BART - Backup and Recovery Tool"
-echo "Alfresco BART is a backup and recovery tool for Alfresco ECM. Is a shell script"
-echo "tool based on Duplicity for Alfresco backups and restore from a local file system,"
-echo "FTP, SCP or Amazon S3 of all its components: indexes, data base, content store "
-echo "and all deployment and configuration files."
-echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-read -p "Install B.A.R.T${ques} [y/n] " -i "n" installbart
 
-if [ "$installbart" = "y" ]; then
- echogreen "Installing B.A.R.T"
-
-
- sudo mkdir -p $ALF_HOME/scripts/bart
- sudo mkdir -p $ALF_HOME/logs/bart
- sudo curl -# -o $TMP_INSTALL/$BART_PROPERTIES $BASE_BART_DOWNLOAD$BART_PROPERTIES
- sudo curl -# -o $TMP_INSTALL/$BART_EXECUTE $BASE_BART_DOWNLOAD$BART_EXECUTE
-
- # Update bart settings
- ALFHOMEESCAPED="${ALF_HOME//\//\\/}"
- BARTLOGPATH="$ALF_HOME/logs/bart"
- ALFBRTPATH="$ALF_HOME/scripts/bart"
- INDEXESDIR="\$\{ALF_DIRROOT\}/solr4"
- # Escape for sed
- BARTLOGPATH="${BARTLOGPATH//\//\\/}"
- ALFBRTPATH="${ALFBRTPATH//\//\\/}"
- INDEXESDIR="${INDEXESDIR//\//\\/}"
-
- sed -i "s/ALF_INSTALLATION_DIR\=.*/ALF_INSTALLATION_DIR\=$ALFHOMEESCAPED/g" $TMP_INSTALL/$BART_PROPERTIES
- sed -i "s/ALFBRT_LOG_DIR\=.*/ALFBRT_LOG_DIR\=$BARTLOGPATH/g" $TMP_INSTALL/$BART_PROPERTIES
- sed -i "s/INDEXES_DIR\=.*/INDEXES_DIR\=$INDEXESDIR/g" $TMP_INSTALL/$BART_PROPERTIES
- sudo cp $TMP_INSTALL/$BART_PROPERTIES $ALF_HOME/scripts/bart/$BART_PROPERTIES
- sed -i "s/ALFBRT_PATH\=.*/ALFBRT_PATH\=$ALFBRTPATH/g" $TMP_INSTALL/$BART_EXECUTE
- sudo cp $TMP_INSTALL/$BART_EXECUTE $ALF_HOME/scripts/bart/$BART_EXECUTE
-
- sudo chmod 700 $ALF_HOME/scripts/bart/$BART_PROPERTIES
- sudo chmod 774 $ALF_HOME/scripts/bart/$BART_EXECUTE
-
- # Install dependency
- sudo apt-get $APTVERBOSITY install duplicity;
-
- # Add to cron tab
- tmpfile=/tmp/crontab.tmp
-
- # read crontab and remove custom entries (usually not there since after a reboot
- # QNAP restores to default crontab: http://wiki.qnap.com/wiki/Add_items_to_crontab#Method_2:_autorun.sh
- sudo -u $ALF_USER crontab -l | grep -vi "alfresco-bart.sh" > $tmpfile
-
- # add custom entries to crontab
- echo "0 5 * * * $ALF_HOME/scripts/bart/$BART_EXECUTE backup" >> $tmpfile
-
- #load crontab from file
- sudo -u $ALF_USER crontab $tmpfile
-
- # remove temporary file
- rm $tmpfile
-
- # restart crontab
- sudo service cron restart
-
- echogreen "B.A.R.T Cron is installed to run in 5AM every day as the $ALF_USER user"
-
-fi
 
 # Finally, set the permissions
 sudo chown -R $ALF_USER:$ALF_GROUP $ALF_HOME

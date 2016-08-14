@@ -1,10 +1,81 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 # -------
 # Script for install of Alfresco
 #
 # Copyright 2013-2014 Loftux AB, Peter Löfgren
 # Distributed under the Creative Commons Attribution-ShareAlike 3.0 Unported License (CC BY-SA 3.0)
 # -------
+# Heavily modified by Housni Yakoob <housni.yakoob@abstraction.co> to suit JLR servers.
+# -------
+
+set -o errexit
+# set -o nounset
+set -o pipefail
+
+
+# Color variables
+txtund=$(tput sgr 0 1)          # Underline
+txtbld=$(tput bold)             # Bold
+bldred=${txtbld}$(tput setaf 1) #  red
+bldgre=${txtbld}$(tput setaf 2) #  red
+bldblu=${txtbld}$(tput setaf 4) #  blue
+bldwht=${txtbld}$(tput setaf 7) #  white
+txtrst=$(tput sgr0)             # Reset
+info=${bldwht}*${txtrst}        # Feedback
+pass=${bldblu}*${txtrst}
+warn=${bldred}*${txtrst}
+ques=${bldblu}?${txtrst}
+
+echoblue () {
+  echo "${bldblu}$1${txtrst}"
+}
+echored () {
+  echo "${bldred}$1${txtrst}"
+}
+echogreen () {
+  echo "${bldgre}$1${txtrst}"
+}
+
+
+ALF_USER_PASS=""
+
+usage() {
+  echo
+  echo "USAGE:"
+  echo "    $0 -p <ALF_USER_PASS>"
+  echo
+  echo "OPTIONS:"
+  echo "    ALF_USER_PASS:"
+  echo "        The password to assign to the Alfresco user that this script will create."
+  echo
+}
+
+while getopts ":p:" opt; do
+  case $opt in
+    p)
+      ALF_USER_PASS="$OPTARG"
+      ;;
+
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
+
+
+if [ -z "$ALF_USER_PASS" ]; then
+  echo
+  echored "You must provide a password for the Alfresco user."
+  usage
+fi
+
 
 export ALF_HOME=/opt/alfresco
 export ALF_DATA_HOME=$ALF_HOME/alf_data
@@ -46,29 +117,6 @@ export BASE_BART_DOWNLOAD=https://raw.githubusercontent.com/toniblyx/alfresco-ba
 export BART_PROPERTIES=alfresco-bart.properties
 export BART_EXECUTE=alfresco-bart.sh
 
-
-# Color variables
-txtund=$(tput sgr 0 1)          # Underline
-txtbld=$(tput bold)             # Bold
-bldred=${txtbld}$(tput setaf 1) #  red
-bldgre=${txtbld}$(tput setaf 2) #  red
-bldblu=${txtbld}$(tput setaf 4) #  blue
-bldwht=${txtbld}$(tput setaf 7) #  white
-txtrst=$(tput sgr0)             # Reset
-info=${bldwht}*${txtrst}        # Feedback
-pass=${bldblu}*${txtrst}
-warn=${bldred}*${txtrst}
-ques=${bldblu}?${txtrst}
-
-echoblue () {
-  echo "${bldblu}$1${txtrst}"
-}
-echored () {
-  echo "${bldred}$1${txtrst}"
-}
-echogreen () {
-  echo "${bldgre}$1${txtrst}"
-}
 cd /tmp
 if [ -d "alfrescoinstall" ]; then
   rm -rf alfrescoinstall
@@ -142,21 +190,16 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 echo "Adding a system user that runs the tomcat Alfresco instance."
 echo "Also updates locale support."
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-# read -e -p "Add alfresco system user${ques} [y/n] " -i "n" addalfresco
-# if [ "$addalfresco" = "y" ]; then
-  # sudo adduser --system --disabled-login --disabled-password --group $ALF_USER
-  sudo adduser $ALF_USER
-  echo
-  echo "Adding locale support"
-  #install locale to support that locale date formats in open office transformations
-  sudo locale-gen $LOCALESUPPORT
-  echo
-  echogreen "Finished adding alfresco user"
-  echo
-# else
-#   echo "Skipping adding alfresco user"
-#   echo
-# fi
+sudo useradd $ALF_USER
+echo "$ALF_USER:$ALF_USER_PASS" | sudo chpasswd
+echo
+echo "Adding locale support"
+#install locale to support that locale date formats in open office transformations
+sudo locale-gen $LOCALESUPPORT
+echo
+echogreen "Finished adding alfresco user"
+echo
+
 
 echo
 echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"

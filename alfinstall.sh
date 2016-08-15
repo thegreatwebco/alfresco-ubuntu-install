@@ -113,7 +113,7 @@ export ALF_DATA_HOME=$ALF_HOME/alf_data
 export CATALINA_HOME=$ALF_HOME/tomcat
 export ALF_USER=alfresco
 export ALF_GROUP=$ALF_USER
-export APTVERBOSITY="-qq -y"
+export APTVERBOSITY="-y"
 export TMP_INSTALL=/tmp/alfrescoinstall
 
 # Branch name to pull from server. Use master for stable.
@@ -413,6 +413,7 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 #read -e -p "Install LibreOffice${ques} [y/n] " -i "n" installibreoffice
 #if [ "$installibreoffice" = "y" ]; then
 
+  echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo /usr/bin/debconf-set-selections
   cd /tmp/alfrescoinstall
   curl -# -L -O $LIBREOFFICE
   tar xf LibreOffice*.tar.gz

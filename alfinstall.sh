@@ -39,22 +39,39 @@ echogreen () {
 
 
 ALF_USER_PASS=""
+SHARE_PORT=8080
+SHARE_PROTOCOL=http
 
 usage() {
   echo
   echo "USAGE:"
-  echo "    $0 -p <ALF_USER_PASS>"
+  echo "    $0 -p <ALF_USER_PASS> -s <SHARE_HOSTNAME> -r <REPO_HOSTNAME>"
   echo
   echo "OPTIONS:"
   echo "    ALF_USER_PASS:"
   echo "        The password to assign to the Alfresco user that this script will create."
   echo
+  echo "    SHARE_HOSTNAME:"
+  echo "        Public host name for Share server (FQDN or IP)."
+  echo
+  echo "    REPO_HOSTNAME:"
+  echo "        Public host name for Alfresco Repository server (FQDN or IP)."
+  echo
+  exit 1
 }
 
-while getopts ":p:" opt; do
+while getopts ":p:s:r:" opt; do
   case $opt in
     p)
       ALF_USER_PASS="$OPTARG"
+      ;;
+
+    s)
+      SHARE_HOSTNAME="$OPTARG"
+      ;;
+
+    r)
+      REPO_HOSTNAME="$OPTARG"
       ;;
 
     \?)
@@ -70,11 +87,25 @@ while getopts ":p:" opt; do
 done
 
 
+# Checking required arguments.
 if [ -z "$ALF_USER_PASS" ]; then
   echo
-  echored "You must provide a password for the Alfresco user."
+  echored "You must provide a password (ALF_USER_PASS) for the Alfresco user."
   usage
 fi
+
+if [ -z "$SHARE_HOSTNAME" ]; then
+  echo
+  echored "You must provide a public host name (SHARE_HOSTNAME) for Share server (FQDN or IP)."
+  usage
+fi
+
+if [ -z "$REPO_HOSTNAME" ]; then
+  echo
+  echored "You must provide a public host name (REPO_HOSTNAME) for Alfresco Repository server (FQDN or IP)."
+  usage
+fi
+
 
 
 export ALF_HOME=/opt/alfresco
@@ -258,18 +289,7 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
   # Add endorsed dir
   sudo mkdir -p $CATALINA_HOME/endorsed
   echo
-  echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-  echo "You need to add the dns name, port and protocol for your server(s)."
-  echo "It is important that this is is a resolvable server name."
-  echo "This information will be added to default configuration files."
-  echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-  read -e -p "Please enter the public host name for Share server (fully qualified domain name)${ques} [`hostname`] " -i "`hostname`" SHARE_HOSTNAME
-  read -e -p "Please enter the protocol to use for public Share server (http or https)${ques} [http] " -i "http" SHARE_PROTOCOL
-  SHARE_PORT=80
-  if [ "${SHARE_PROTOCOL,,}" = "https" ]; then
-    SHARE_PORT=443
-  fi
-  read -e -p "Please enter the host name for Alfresco Repository server (fully qualified domain name)${ques} [$SHARE_HOSTNAME] " -i "$SHARE_HOSTNAME" REPO_HOSTNAME
+
 
   # Add default alfresco-global.propertis
   ALFRESCO_GLOBAL_PROPERTIES=/tmp/alfrescoinstall/alfresco-global.properties

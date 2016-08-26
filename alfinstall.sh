@@ -449,9 +449,9 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
   sudo apt-get $APTVERBOSITY install imagemagick ghostscript libgs-dev libjpeg62 libpng3
   echo
   IMAGEMAGICKVERSION=`ls /usr/lib/|grep -i imagemagick`
-  echoblue "Creating symbolic link for ImageMagick."
-  sudo ln -s /usr/lib/$IMAGEMAGICKVERSION /usr/lib/ImageMagick
-  echo
+#  echoblue "Creating symbolic link for ImageMagick."
+#  sudo ln -s /usr/lib/$IMAGEMAGICKVERSION /usr/lib/ImageMagick
+#  echo
   echogreen "Finished installing ImageMagick"
   echo
 #else

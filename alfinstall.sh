@@ -463,13 +463,13 @@ echoblue "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
 # Installing SWFTools via the repository because the source installation doesn't work in 16.04.
-#echo
-#echoblue "Installing SWFTools."
-#echo
-#sudo apt-get $APTVERBOSITY install swftools
-#echo
-#echogreen "Finished installing SWFTools."
-#echo
+echo
+echoblue "Installing SWFTools."
+echo
+sudo apt-get $APTVERBOSITY install swftools
+echo
+echogreen "Finished installing SWFTools."
+echo
 
 echo
 echoblue "Adding basic support files. Always installed if not present."
